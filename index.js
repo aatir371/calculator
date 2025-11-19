@@ -1,25 +1,14 @@
 let digit_input = [];
-let optr;
-// let current_optr;
-let operator_first_click = true;
-let num1, num2;
-let result;
+let computaion_array = [];
+let optr = null;
+let num1 = null;
+let num2 = null;
+let num1Lock = false;
+let result = null;
 
-// let multi = ['aatir', 123, true, 'bro', 541];
-
-// multi.forEach(element => {
-//     console.log(typeof element);
-// });
-
-// document.getElementById('num-btn').onclick = function(){
-//     num = document.getElementById('num-btn').value;
-//     console.log(num);
-// }
-
-// document.getElementsByClassName('num-btn').onclick = function(){
-//     num = document.getElementById('num-btn').value;
-//     console.log(num);
-// }
+///////////////////////////////////////////////////////////////////////////
+//////////////////////////////// FUNCTIONS ////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 
 function str_to_num(str_arr){
     const int_arr = str_arr.map(Number);
@@ -50,54 +39,82 @@ function calculate(number1, number2, opertor){
         default:
             console.error("Opertor is incorrect!");
     }
-
 }
+
+function get_computaion_result(comp_array){
+    console.log(comp_array);
+    for (let i=0; i < comp_array.length; i++){
+        if (typeof comp_array[i] === "number"){
+            if (!num1Lock){
+                num1 = comp_array[i];
+                num1Lock = true;
+            }else {
+                num2 = comp_array[i];
+            }
+        } else if (typeof comp_array[i] === "string"){
+            if (typeof comp_array[i+1] === "string"){
+                continue;
+            }
+            optr = comp_array[i];
+            if (num2 === null){
+                // console.warn("Warning: num1 is not defined!");
+                continue;
+            } else{
+                num1 = calculate(num1, num2, optr);
+            }
+        }else{
+            console.error("Error: input type is not correct!")
+        }
+    }
+    return calculate(num1, num2, optr);
+}
+
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////// BUTTON RESPONSE ////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
 
 
 document.querySelectorAll('.num-btn').forEach(btn => {
     btn.addEventListener('click', function () {
-        // console.log(this.value);
         digit_input.push(this.value)
-        console.log(digit_input)
-        // console.log(typeof digit_input[0]);
+        // console.log(digit_input)
     });
 });
 
 document.querySelectorAll('.optr-btn').forEach(btn => {
     btn.addEventListener('click', function () {
-        // optr = current_optr;
-        // current_optr = this.value;
-        // console.log(current_optr);
-
-        if (operator_first_click){
-            operator_first_click = !operator_first_click;
-            num1 = str_to_num(digit_input);
-            // console.log(num1);
-            // optr = this.value;
-            // console.log(optr);
-        } else{
-            num2 = str_to_num(digit_input);
-            // console.log(num2);
-            // perform calculations | result => num1
-            result = calculate(num1, num2, optr);
-            console.log(result);
-            num1 = result;
-        }
-        optr = this.value;
-        console.log(optr);
-        digit_input = [];
+        computaion_array.push(str_to_num(digit_input));
+        digit_input = []
+        computaion_array.push(this.value);
     });
 });
 
-
-document.getElementById('get-result').onclick = function(){
-    num2 = str_to_num(digit_input);
-    result = calculate(num1, num2, optr);
-    console.log(result);
+document.getElementById('get-result-using-equal-to').onclick = function(){
+    computaion_array.push(str_to_num(digit_input));
+    digit_input = []
+    result = get_computaion_result(computaion_array);
+    console.log("result: " + result);
     num1 = result;
+    reset();
+}
+
+document.getElementById('clear-all').onclick = function(){
+    reset();
+    num1 = null;
 }
 
 
 
+function reset(){
+    digit_input = [];
+    computaion_array = [];
+    optr = null;
+    num1 = null;
+    num2 = null;
+    num1Lock = false;
+    result = null;
+}
 
-// operator_first_click = true; (when AC is pressed)
+// controler function (js main function)
